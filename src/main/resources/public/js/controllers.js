@@ -35,13 +35,18 @@ app.controller('PregnantCtrl', function($scope, $interval, pregnantService) {
 	$scope.pregnant = {};
 	$scope.currentContraction = {};
 	$scope.freqs = [];
-	$scope.startContraction = function(){
+	$scope.startContraction = function(delay){
+		if (delay === undefined) {
+			delay = 0;
+		}
 		$scope.currentContraction = {};
 		var d = new Date();
+		d = new Date(d.getTime() - delay*1000);
 		$scope.currentContraction = {start:d};		
 		$scope.count();
 		$scope.lastStart = d;
 		$scope.countLastFreq();
+		$scope.stopCountLastFreq();
 	}
 
 	$scope.transformContractions = function(pregnant) {
@@ -61,12 +66,13 @@ app.controller('PregnantCtrl', function($scope, $interval, pregnantService) {
 		pregnant.contractions.sort(function (a,b) {
 			  return new Date(b.finish) - new Date(a.finish);
 		});
-		console.log('after sort:');
-		console.log(pregnant.contractions);
+		
 		for (var i=0;i<pregnant.contractions.length-1;i++) {
 			var s  = new Date($scope.pregnant.contractions[i].start);
 			var f =  new Date($scope.pregnant.contractions[i+1].start);
-			pregnant.contractions[i].frequency = Math.ceil(Math.abs(s.getTime() - f.getTime())/1000);
+			
+			pregnant.contractions[i].frequency = $scope.getDiffInFormat(s, f, true);
+
 		}
 		if (pregnant.contractions.length >0) {
 			var lastContraction = pregnant.contractions[0];
@@ -76,8 +82,12 @@ app.controller('PregnantCtrl', function($scope, $interval, pregnantService) {
 		$scope.pregnant = pregnant;
 
 	}
-	$scope.stopContraction = function(){
+	$scope.stopContraction = function(delay){
+		if (delay === undefined) {
+			delay = 0;
+		}
 		var d = new Date();
+		d = new Date(d.getTime() - delay*1000);
 		$scope.currentContraction.finish = d;
 		pregnantService.addContraction({"pregnantId":$scope.pregnant.id}, 
 			$scope.currentContraction, function(data) {
@@ -88,6 +98,7 @@ app.controller('PregnantCtrl', function($scope, $interval, pregnantService) {
 		});
 		$scope.currentContraction = {};
 		$scope.stopCount();
+		$scope.countLastFreq();
 	}
 	$scope.getFrequencies = function () {
 		var freqs = [];
@@ -109,17 +120,34 @@ app.controller('PregnantCtrl', function($scope, $interval, pregnantService) {
 	$scope.getDuration = function(start,finish) {
 		start = new Date(start);
 		finish = new Date(finish);
-
-		return Math.ceil(Math.abs(finish.getTime() - start.getTime())/1000);
+		
+		return $scope.getDiffInFormat(start, finish, false);
 
 	}
+
+	$scope.getDiffInFormat = function(s, f, withHours) {
+		var diff = Math.ceil(Math.abs(s.getTime() - f.getTime())/1000);
+		var date = new Date(null);
+		date.setSeconds(diff); 
+		var result;
+		if (withHours) {
+			result = date.toISOString().substr(11, 8);
+		} else {
+			result = date.toISOString().substr(14, 5);
+		}
+
+		return result;
+	}
+
 	var stopFreq;
 	$scope.countLastFreq = function() {
 		 // Don't start a new fight if we are already fighting
           if ( angular.isDefined(stopFreq) ) return;
 
           stopFreq = $interval(function() {
-            $scope.timeLapsedSinceLastFreq = Math.ceil(Math.abs((new Date()).getTime() - $scope.lastStart.getTime())/1000) + ' seconds';
+
+
+            $scope.timeLapsedSinceLastFreq = $scope.getDiffInFormat(new Date(), $scope.lastStart, true);
           }, 100);
 	}
 
@@ -132,7 +160,7 @@ app.controller('PregnantCtrl', function($scope, $interval, pregnantService) {
 
           stop = $interval(function() {
             
-            $scope.timeLapsed = Math.ceil(Math.abs((new Date()).getTime() - $scope.currentContraction.start.getTime())/1000) + ' seconds';
+            $scope.timeLapsed = $scope.getDiffInFormat(new Date(), $scope.currentContraction.start, false);
           }, 100);
         };
 	$scope.stopCount = function() {
@@ -147,7 +175,7 @@ app.controller('PregnantCtrl', function($scope, $interval, pregnantService) {
             $interval.cancel(stopFreq);
             stopFreq = undefined;
           }
-          $scope.timeLapsedSinceLastFreq = undefined;
+         // $scope.timeLapsedSinceLastFreq = undefined;
         };
           $scope.$on('$destroy', function() {
           // Make sure that the interval is destroyed too

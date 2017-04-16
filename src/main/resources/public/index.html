@@ -32,9 +32,38 @@
   		
 	</div>
 
- 
-<button  class="btn btn-success" ng-show= "currentContraction.start===undefined" ng-click="startContraction()">Start</button>
-<button  class="btn btn-danger" ng-show= "currentContraction.start!==undefined" ng-click="stopContraction()">Stop</button>
+ <!-- Split button -->
+<div class="btn-group" ng-show= "currentContraction.start===undefined">
+  <button type="button" class="btn btn-success" ng-click="startContraction()">Start Now</button>
+  <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <span class="caret"></span>
+    <span class="sr-only">Toggle Dropdown</span>
+  </button>
+  <ul class="dropdown-menu">
+    <li><a href="#" ng-click="startContraction(5)">5 Seconds Ago</a></li>
+    <li><a href="#" ng-click="startContraction(10)">10 Seconds Ago</a></li>
+    <li><a href="#" ng-click="startContraction(30)">30 Seconds Ago</a></li>
+    <li><a href="#" ng-click="startContraction(60)">1 Minute Ago</a></li>
+    <li><a href="#" ng-click="startContraction(120)">2 Minutes Ago</a></li>
+  </ul>
+</div>
+
+<div class="btn-group" ng-show= "currentContraction.start!==undefined">
+  <button type="button" class="btn btn-danger" ng-click="stopContraction()">Stop Now</button>
+  <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <span class="caret"></span>
+    <span class="sr-only">Toggle Dropdown</span>
+  </button>
+  <ul class="dropdown-menu">
+    <li><a href="#" ng-click="stopContraction(5)">5 Seconds Ago</a></li>
+    <li><a href="#" ng-click="stopContraction(10)">10 Seconds Ago</a></li>
+    <li><a href="#" ng-click="stopContraction(30)">30 Seconds Ago</a></li>
+    <li><a href="#" ng-click="stopContraction(60)">1 Minute Ago</a></li>
+    <li><a href="#" ng-click="stopContraction(120)">2 Minutes Ago</a></li>
+  </ul>
+</div>
+
+
 {{timeLapsed}}
 <table class="table" >
 	<thead>
@@ -46,10 +75,10 @@
 			Stop
 		</th>
 		<th>
-			Duration
+			Duration (MM:SS)
 		</th>
 		<th>
-			Frequency
+			Frequency (HH:MM:SS)
 		</th>
 
 	</thead>
@@ -61,10 +90,10 @@
 			{{c.finish | date : 'HH:mm:ss dd/MM/yyyy '}}
 		</td>
 		<td>
-			{{ getDuration(c.start, c.finish)}} seconds
+			{{ getDuration(c.start, c.finish)}}
 		</td>
 		<td>
-			{{ c.frequency }} seconds
+			{{ c.frequency }}
 		</td>
 	</tr>
 </table>
