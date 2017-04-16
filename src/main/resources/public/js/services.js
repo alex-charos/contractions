@@ -1,12 +1,10 @@
 'use strict';
-/*
-var pregnantService = angular.module('pregnantService', ['ngResource']);
-pregnantService.factory('pregnantService',[ '$resource', function($resource) {
+app.factory('pregnantService',[ '$resource', function($resource) {
      return $resource('/api/contractions/', {} , {
-		createPregnant 		: {method:'POST'},
+		createPregnant 		: {method:'POST',	url:'/api/contractions/', isArray:false},
 		getPregnant	 	: {method:'GET', 	url:'/api/contractions/:pregnantId', isArray:false},
-		addContraction	 	: {method:'POST', 	url:'/api/contractions/:pregnantId', isArray:false}
+		getAllPregnants	 	: {method:'GET', 	url:'/api/contractions', isArray:true},
+		addContraction	 	: {method:'POST', 	url:'/api/contractions/:pregnantId'}
      }); 
 
 }]);
- */
