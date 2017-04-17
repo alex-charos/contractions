@@ -2,7 +2,7 @@
 
 
 app.controller('PregnantCtrl', function($scope, $interval, pregnantService) {
-	$scope.hoursAgo = 1;
+	$scope.hoursAgo = 5;
 	$scope.pregnants = pregnantService.getAllPregnants(function(data){
 		if (data.length ===1) {
 			$scope.pregnant = data[0];
